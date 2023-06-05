@@ -58,3 +58,31 @@
 //   return amplitude;
 // }
 // console.log(calcAmplitudeNew(temperatures, temperatures2));
+
+// const measureKelvin = function() {
+//   const measurement = {
+//     type: 'temp',
+//     unit: 'celsius',
+//     value: Number(prompt('Degrees celsius:')),
+//   };
+//   console.table(measurement);
+//   const kelvin = measurement.value + 273;
+//   return kelvin;
+// };
+
+// console.log(measureKelvin());
+
+
+// Coding Challange # 1
+
+// const data1 = [17, 21, 23];
+
+// const printForecast = function (arr) {
+//   let str = '';
+//   for(let i = 0; i < arr.length; i++) {
+//     str = str + `${arr[i]} Celcius in ${i + 1} days...`
+//   }
+//   console.log(`...` + str);
+// }
+
+// console.log(printForecast(data1));
