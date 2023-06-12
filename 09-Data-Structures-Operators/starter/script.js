@@ -124,6 +124,8 @@ const restaurant = {
 // console.log(o, c);
 
 
+
+
 // restaurant.orderDelivery({
 //   time: '22:30',
 //   address: 'Via del Sole, 21',
@@ -474,7 +476,7 @@ const restaurant = {
 
 // for (const item of menu) console.log(item); // ---> we dont have more lines, tnat why we dont open a block {}
 
-// // index and element --> its not a great solution, but we can = .entries()
+// // index and element //--> its not a great solution, but we can = .entries()
 // for (const [i,el] of menu.entries()) {
 //   console.log(`${i+1}: ${el}`);
 // }
@@ -568,7 +570,7 @@ const restaurant = {
 //   name: 'Jonas',
 //   email: 'hello@jonas.io'
 // }];
-
+// console.log(users);
 
 // // good way
 // console.log(users[0]?.name ?? 'User array empty');
@@ -610,7 +612,7 @@ const restaurant = {
 //   console.log(`On ${key} we open as ${open} and close at ${close}`);
 // }
 
-// simpler exemple
+// // simpler exemple
 // const hours =  {
 //   open: 12,
 //   close: 23,
@@ -756,5 +758,409 @@ const restaurant = {
 //..............................................................................
 // MAPS
 
+// its similar to an object, but on the keys could be any kind(string, array,etc)
 
+
+// Create
+// const rest = new Map();
+
+// rest.set('name', 'Classico Italiano');
+// rest.set(1, 'Firenze italy');
+// console.log(rest.set(2, 'Lisbon Portugal'));
+
+// rest
+// .set('categories', ['Italian', 'Pizzeria', 'Vegetarian', 'Organic'])
+// .set('open', 11)
+// .set('close', 23)
+// .set(true, 'We are open')
+// .set(false, 'We are closed');
+
+
+// console.log(rest);
+
+
+// // Read
+// console.log(rest.get('name'));
+// console.log(rest.get(true));
+// console.log(rest.get(1));
+
+// const time = 21;
+
+// console.log(rest.get(time > rest.get('open') && time < rest.get('close')));
+
+
+// // Presence
+// console.log(rest.has('categories'));
+
+// // Delete
+// console.log(rest);
+// rest.delete(1); // ---> 1, 'Firenze italy'
+// console.log(rest);
+
+// // Size
+// console.log(rest.size);
+
+// // Remove all elements
+// // rest.clear();
+
+// const arr = [1, 2];
+// rest.set(arr, 'Test');
+// console.log(rest.get(arr));
+
+// rest.set(document.querySelector('h1'), 'Heading');
+
+// console.log(rest);
+//..............................................................................
+
+
+
+
+
+
+
+//..............................................................................
+//  MAPS ITERATION
+
+
+// create a new map without SET:
+
+// const question = new Map([
+//   ['question', 'What language do you speak?'],
+//   [1, 'C'],
+//   [2, 'Java'],
+//   [3, 'Javascript'],
+//   ['correct', 3],
+//   [true, 'correct'],
+//   [false, 'Try again'],
+// ]);
+
+// console.log(question);
+
+
+// // Convert objects to map:
+// // console.log(Object.entries(restaurant.openingHours));
+// // const hoursMap = new Map(Object.entries(restaurant.openingHours));
+// // console.log(hoursMap);
+
+// // Iteration
+
+// console.log(question.get('question'));
+
+// for (const [key, value] of question) {
+//   if (typeof key === 'number') console.log(`Answer ${key}: ${value}`);
+// }
+
+// // const answer = Number(prompt('Your answer'));
+// // console.log(answer);
+
+// // console.log(question.get(question.get('correct') === answer ));
+
+
+// // Convert Map to array:
+//  console.log([...question]);
+
+
+//  console.log([...question.keys()]);
+//  console.log([...question.values()]);
+//..............................................................................
+
+
+
+
+
+
+//..............................................................................
+// DATA STRUCTURE - wich should we use?
+
+//  Array - Object - Set - Map
+
+// 3 sources of data:
+// 3.1 - source code
+// 3.2 - input from user (UI)
+// 3.3 - fetched from API
+
+// Simple list: array or set
+// Key/Value pairs: object or maps
+
+//  Array vs Sets
+// arrays, ordem interssa, podem repetir e podemos manipular os dados
+// sets, valores unicos, remover duplicados, high-performance...delete it is 10 times faster then in arrays
+
+
+// Object vs Maps
+// both keys and pairs
+// objects - traditional, easier to write, keys only strings, when you need to include function(methods), when using Json
+// maps - better performance, keys any data type, easy to iterate
+//..............................................................................
+
+
+
+
+
+
+//..............................................................................
+// Coding Challange #3
+
+// const gameEvents = new Map([
+//   [17, '⚽️ GOAL'],
+//   [36, '🔁 Substitution'],
+//   [47, '⚽️ GOAL'],
+//   [61, '🔁 Substitution'],
+//   [64, '🔶 Yellow card'],
+//   [69, '🔴 Red card'],
+//   [70, '🔁 Substitution'],
+//   [72, '🔁 Substitution'],
+//   [76, '⚽️ GOAL'],
+//   [80, '⚽️ GOAL'],
+//   [92, '🔶 Yellow card'],
+// ]);
+
+// // 1
+// console.log(gameEvents.values());
+// const events = [...new Set(gameEvents.values())];
+// console.log(events);
+
+// // 2
+// gameEvents.delete(64);
+// console.log(gameEvents);
+
+// // 3
+// const time = [...gameEvents.keys()].pop();
+// console.log(time);
+// console.log(`An event happened, on average, every ${time / gameEvents.size} minutes`);
+
+
+// //4
+// console.log(gameEvents);
+
+// for (const [min, event] of gameEvents) {
+//   const half = min <= 45 ? 'First' : 'Second';
+//   console.log(`[${half} Half] ${min}: ${event})`);
+// }
+
+//..............................................................................
+
+
+
+
+
+//..............................................................................
+// STRINGS - Part 1
+
+// strings are primitives
+
+// BOXING: para podermos usar os metodos, o javascript comnverte a string em objecto para depois podermos usar os metodos
+
+
+// const airline = 'Tap Air Portugal';
+// const plane = 'A320';
+
+
+// // READ
+// console.log(plane[0]);
+// console.log(plane[1]);
+// console.log(plane[2]);
+// console.log('B737'[0]);
+// console.log(airline.length);
+// console.log('B737'.length);
+
+// // METHODS
+// console.log('B737'.indexOf('7'));
+// console.log(airline.indexOf('r'));
+// console.log(airline.lastIndexOf('r'));
+// console.log(airline.indexOf('Portugal'));
+
+// console.log(airline.slice(4)); //sub string - part of a string
+// console.log(airline.slice(4, 7)); // return Air
+
+// // first word of a string
+// console.log(airline.slice(0, airline.indexOf('   ')));
+// // last word of a string
+// console.log(airline.slice(airline.lastIndexOf(' ') + 1));
+
+
+// console.log(airline.slice(-2));
+// console.log(airline.slice(1, -1));
+
+
+
+// const checkMiddlesSeat = function (seat) {
+//   // B and E are middle seats
+//   const s = seat.slice(-1);
+//   if (s === 'B' || s === 'E') console.log(`You got a middle seat`);
+//   else console.log(`You got lucky`);
+// };
+
+// checkMiddlesSeat('11B');
+// checkMiddlesSeat('23C');
+// checkMiddlesSeat('3E');
+// //..............................................................................
+
+
+
+
+
+
+// //..............................................................................
+// // STRING - Part 2
+
+
+// console.log(airline.toLowerCase());
+// console.log(airline.toUpperCase());
+
+// // Capitalization
+// const passenger = 'jOnAS';
+// const passengerLower = passenger.toLowerCase()
+// const passengerCorrect = passengerLower[0].toUpperCase() + passengerLower.slice(1);
+// console.log(passengerCorrect);
+
+
+// // Comparing email
+// const email = 'hello@jonas.io';
+// const loginEmail = '  Hello@Jonas.Io \n';
+
+// // const lowerEmail = loginEmail.toLowerCase();
+// // const trimmedEmail = lowerEmail.trim(); // ---> remove empty spaces
+// // console.log(trimmedEmail);
+
+
+// const normalizedEmail = loginEmail.toLowerCase().trim();
+// console.log(normalizedEmail);
+// console.log( email === normalizedEmail);
+
+
+// // Replacing
+
+// const priceGB = '288,97 pounds'
+// const priceUS = priceGB.replace('pounds', 'euros').replace(',', '.');
+// console.log(priceUS);
+
+// // replace all
+// const announcement = `All passengers come boarding door 23. Boarding door 23!`;
+// console.log(announcement.replaceAll('door','gate'));
+
+// // Booleans
+// const plane1 = 'Airbus A320neo';
+
+// console.log(plane1.includes('A320'));
+// console.log(plane1.includes('Boeing'));
+// console.log(plane1.startsWith('Air'));
+
+// if (plane1.startsWith('Airbus') && plane1.endsWith('neo')) {
+//   console.log(`Part of NEW Airbus family`);
+// }
+
+// // Practice exercice
+
+// const checkBaggage = function (items) {
+//   const baggage = items.toLowerCase();
+//   if (baggage.includes('knife') || baggage.includes('gun')) {
+//     console.log(`You are not allowed on board`);
+//   } else {
+//     console.log('Welcome aboard!');
+//   }
+// };
+
+// checkBaggage(`I have laptop, some foof and pocket knife`);
+// checkBaggage(`Socks and camera`);
+// checkBaggage(`Get some snacks and a gun for protection`);
+
+// //..............................................................................
+
+
+
+
+
+
+//  //.............................................................................
+// // String - Part 3
+
+// // SPLIT
+// console.log(`a+very+nice+string`.split('+')); // ---> convert to an array
+// console.log(`Manuel Fernandes Dutra`.split(' '));
+// const [firstName, lastName] = 'Manuel Dutra'. split(' ');
+// console.log(firstName, lastName);
+
+// // JOIN
+// const newName = ['Mr.', firstName, lastName.toUpperCase()].join(' ');
+// console.log(newName);
+
+
+
+// const capitalizeName = function (name) {
+//   const names = name.split(' ');
+//   const namesUpper = [];
+//   for (const n of names) {
+//     // namesUpper.push(n[0].toUpperCase() + n.slice(1));
+//     // or
+//     namesUpper.push(n.replace(n[0], n[0].toUpperCase()));
+//   };
+//   console.log(namesUpper.join(' '));
+// };
+
+// capitalizeName('jessica ann smith davis');
+// capitalizeName('manuel fernandes dutra');
+
+// // Padding
+// const message = `Go to gate 23!`;
+// console.log(message.padStart(25, '+').padEnd(30, '+'));
+// console.log('Jonas'.padStart(25, '+').padEnd(40, '+'));
+
+
+// const maskCredit = function (number) {
+//   const str = number + '';
+//   const last = str.slice(-4);
+//   return last.padStart(str.length, '*');
+// }
+
+// console.log(maskCredit(4675956956096));
+// console.log(maskCredit(797979576454));
+// console.log(maskCredit(123456789));
+
+// //Repeat
+
+// const message2 = `Bad weather...all departures Delayed...  `;
+// console.log(message2.repeat(5));
+
+// const planesInLine = function(n) {
+//   console.log(`There are ${n} planes in line ${'🛩'.repeat(n)}`)
+// }
+
+// planesInLine(5);
+// planesInLine(3);
+
+//..............................................................................
+
+
+
+
+
+
+
+
+//..............................................................................
+//Coding Challenge #4
+
+
+//..............................................................................
+
+
+
+
+
+
+
+//..............................................................................
+// String methods pratice
+
+// console.log(flights.split('+'));
+
+// const getCode = str => str.slice(0, 3).toUpperCase();
+
+// for (const flight of flights.split('+')) {
+//   const [type, from, to, time] = flight.split(';');
+//   const output = `${type.startsWith('_Delayed') ? '🎈' : ''}${type.replaceAll('_',' ')} ${getCode(from)}${getCode(to)} ${time.replace(':', 'h')}`.padStart(36);
+
+//   console.log(output);
+// }
 //..............................................................................
