@@ -61,84 +61,99 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-
-const displayMovements = function (movements) {
-
+// ....................................................
+const displayMovements = function (movements, sort = false) {
   // Limpar o html
   // innerHTML vs. textContent:
   // innnerHTML = returns everything including the html tags
   // textContent = just the text
   containerMovements.innerHTML = '';
 
-  movements.forEach(function(mov, i) {
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
 
-
+  movs.forEach(function(mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
         <div class="movements__value">${mov}€</div>
-      </div>
-    `;
-
-    containerMovements.insertAdjacentHTML('afterbegin', html);
-  });
-};
-
-displayMovements(account1.movements);
+        </div>
+        `;
+        containerMovements.insertAdjacentHTML('afterbegin', html);
+      });
+    };
+    // ....................................................
 
 
+    // ....................................................
+    // Current Balance --> .reduce and sum the elements of the movements array
+    const calcDisplayBalance = function(acc) {
+      acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+      labelBalance.textContent = `${acc.balance} €`;
+    };
+    // ....................................................
+
+
+    // ....................................................
+    // Resumo bottom - in out interest
+    const calcDisplaySummary = function(acc){
+      const incomes = acc.movements
+        .filter(mov => mov > 0)
+        .reduce((acc, mov) => acc + mov, 0);
+
+      labelSumIn.textContent = `${incomes}€`;
+
+      const outcomes = acc.movements
+        .filter(mov => mov < 0)
+        .reduce((acc, mov) => acc + mov, 0);
+
+      labelSumOut.textContent = `${Math.abs(outcomes)}€`;
+
+      const interest = acc.movements
+        .filter(mov => mov > 0)
+        .map(deposit => (deposit * acc.interestRate) / 100)
+        .filter((interest, index, array) => {
+          console.log(array);
+          return interest >= 1;
+        })
+        .reduce((acc, interest) => acc + interest, 0);
+
+      labelSumInterest.textContent = `${interest}€`;
+    };
+    // ....................................................
+
+// ....................................................
 // Username - add a new pair on the object: username: 'md'
 const createUsernames = function(accs) {
   accs.forEach(function(acc){
     acc.username = acc.owner
       .toLowerCase()
       .split(' ') // ---> puts on array
-      .map(name => name[0]). //---> array with the first letter
-      join(''); //---> convert array into a string
+      .map(name => name[0]) //---> array with the first letter
+      .join(''); //---> convert array into a string
   });
 };
 createUsernames(accounts);
-console.log(accounts);
-
-// Current Balance --> .reduce and sum the elements of the movements array
-const calcDisplayBalance = function(movements) {
-  const balance = movements.reduce((acc, curr) => acc + curr, 0);
-  labelBalance.textContent = `${balance} EUR`;
-}
-calcDisplayBalance(account1.movements);
+// ....................................................
 
 
-// Resumo bottom - in out interest
-const calcDisplaySummary = function(acc){
-  const incomes = acc.movements
-    .filter(mov => mov > 0)
-    .reduce((acc, mov) => acc + mov, 0);
-
-  labelSumIn.textContent = `${incomes}€`;
-
-  const outcomes = acc.movements
-    .filter(mov => mov < 0)
-    .reduce((acc, mov) => acc + mov, 0);
-
-  labelSumOut.textContent = `${Math.abs(outcomes)}€`;
-
-  const interest = acc.movements
-    .filter(mov => mov > 0)
-    .map(deposit => (deposit * acc.interestRate) / 100)
-    .filter((interest, index, array) => {
-      console.log(array);
-      return interest >= 1;
-    })
-    .reduce((acc, interest) => acc + interest, 0);
-
-  labelSumInterest.textContent = `${interest}€`;
+// ....................................................
+const updateUI = function(acc) {
+  // Display movements
+  displayMovements(acc.movements);
+  // Display balance
+  calcDisplayBalance(acc);
+  // Display summary
+  calcDisplaySummary(acc);
 };
+// ....................................................
 
 
+
+
+
+// ....................................................
 // Log in - implementing
-
 // event handelers
 let currentAccount;
 
@@ -157,17 +172,96 @@ btnLogin.addEventListener('click', function(event){
     // remove cursor blinking
     inputLoginPin.blur();
 
-    // Display movements
-    displayMovements(currentAccount.movements);
-
-    // Display balance
-    calcDisplayBalance(currentAccount.movements);
-
-    // Display summary
-    calcDisplaySummary(currentAccount);
+    // Display movements, balance and summary
+    updateUI(currentAccount);
 
   };
 });
+// ....................................................
+
+
+
+
+// ....................................................
+// Transfers - right side of the app
+btnTransfer.addEventListener(`click`, function(event){
+  event.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
+  // clear the field
+  inputTransferAmount.value = inputTransferTo.value = ' ';
+  // remove money from current user and add positive on the receiver
+  // current user have enought money? verify if number is positive
+  if ( amount > 0 &&
+      receiverAcc &&
+      currentAccount.balance >= amount &&
+      receiverAcc?.username !== currentAccount.username
+    ) {
+      // Doing the transfer
+      currentAccount.movements.push(-amount);
+      receiverAcc.movements.push(amount);
+      // Update users interface
+      updateUI(currentAccount);
+  }
+
+});
+// ....................................................
+
+
+
+// ....................................................
+// LOAN
+btnLoan.addEventListener(`click`, function(event){
+  event.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 &&  currentAccount.movements.some(mov => mov >= 0.1 * amount)) {
+    // Add movement to current account
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  };
+  inputTransferAmount.value = '';
+});
+// ....................................................
+
+
+
+
+
+
+// ....................................................
+// Close account
+btnClose.addEventListener(`click`, function(event){
+  event.preventDefault();
+
+  if (inputCloseUsername.value === currentAccount.username
+    && inputClosePin.value === currentAccount.pin) {
+      const index = accounts.findIndex(acc => acc.username === currentAccount.username);
+      console.log(index);
+      // Delete account
+      accounts.splice(index, 1);
+      // Hide UI
+      containerApp.style.opacity = 0;
+    };
+  // Clear fields
+  inputTransferAmount.value = inputTransferTo.value = ' ';
+});
+// ....................................................
+
+
+// ....................................................
+// Sort
+
+let sorted = false;
+
+btnSort.addEventListener(`click`, function(event){
+  event.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
+});
+// ....................................................
+
+
+
 
 
 /////////////////////////////////////////////////
@@ -233,7 +327,7 @@ console.log(letters.join('-'));
 const animals = ['pigs', 'goats', 'sheep'];
 console.log(animals.push('cows')); //---> adiciona no fim
 
-// shift
+// SHIFT
 // The shift() method removes the first element from an array
 // and returns that removed element.
 //  This method changes the length of the array.
@@ -242,7 +336,7 @@ const firstElement = array1.shift();
 console.log(array1);// Expected output: Array [2, 3]
 console.log(firstElement);// Expected output: 1
 
-// unshift
+// UNSHIFT
 // The unshift() method adds the specified elements to the
 //  beginning of an array and returns the new length of the array.
 const array2 = [1, 2, 3];
@@ -640,4 +734,361 @@ console.log(firstWithdrawal);
 console.log(accounts);
 const account = accounts.find(account => account.owner === `Jessica Davis`)
 console.log(account);
+// ....................................................
+
+
+
+// ....................................................
+// Find Index
+// The findIndex() method returns the index
+//  of the first element in an array that satisfies
+//  the provided testing function.
+//  If no elements satisfy the testing function, -1 is returned.
+const array8 = [5, 12, 8, 130, 44];
+const isLargeNumber = (element) => element > 13;
+
+console.log(array8.findIndex(isLargeNumber));
+// Expected output: 3
+// ....................................................
+
+
+// ....................................................
+// SOME
+// The some() method tests whether at least one element in the array
+// passes the test implemented by the provided function.
+// It returns true if, in the array,
+// it finds an element for which the provided function
+// returns true; otherwise it returns false. It doesn't
+// modify the array.
+const array9 = [1, 2, 3, 4, 5];
+// Checks whether an element is even
+const even = (element) => element % 2 === 0;
+console.log(array9.some(even));
+// Expected output: true
+
+// Other exemples - Some kind related with .includes method
+// Includes - check equality
+// Some - condition
+console.log(movements);
+console.log(movements.includes(-130));
+// Lets write the previous line with the some method:
+console.log(movements.some(mov => mov === -130));
+
+
+console.log(movements.some(mov => mov > 0 ));
+console.log(movements.some(mov => mov > 5000 ));
+console.log(movements.some(mov => mov > 1500));
+// ....................................................
+
+
+
+// ....................................................
+// EVERY
+// The every() method tests whether all elements in the
+//  array pass the test implemented by the provided function.
+//  It returns a Boolean value.
+const isBelowThreshold = (currentValue) => currentValue < 40;
+const array10 = [1, 30, 39, 29, 10, 13];
+console.log(array10.every(isBelowThreshold));
+// Expected output: true
+
+// Other examples
+console.log(movements.every(mov => mov > 0));
+console.log(account4.movements.every(mov => mov > 0));
+
+// Separate callback
+const deposit = mov => mov < 0;
+console.log(movements.some(deposit));
+console.log(movements.every(deposit));
+console.log(movements.filter(deposit));
+// ....................................................
+
+
+
+// ....................................................
+// FLAT
+const arr11 = [0, 1, 2, [3, 4]];
+console.log(arr11.flat());
+// Expected output: Array [0, 1, 2, 3, 4]
+const arr12 = [0, 1, 2, [[[3, 4]]]];
+console.log(arr12.flat(2));
+// Expected output: Array [0, 1, 2, Array [3, 4]]
+
+// Other exemples
+const arr14 = [[1,2,3], [4,5,6], 7, 8];
+console.log(arr14.flat());
+const arrDeep = [[[1,2],3], [4,[5,6]], 7, 8];
+console.log(arrDeep.flat(2)); //deepth argument - 2
+// ....................................................
+
+
+// ....................................................
+// FLATMAP
+
+// Combines the flat and the map
+
+// const arr13 = [1, 2, 1];
+// const result = arr13.flatMap((num) => (num === 2 ? [2, 2] : 1));
+// console.log(result);
+// Expected output: Array [1, 2, 2, 1]
+// ....................................................
+
+
+
+
+// ....................................................
+// Small exercise...calculate all the balance of all accounts
+// Another one
+const accountMovements = accounts.map(acc => acc.movements);
+console.log(accountMovements);
+const allMovements = accountMovements.flat();
+console.log(allMovements);
+const overalBalance = allMovements.reduce((acc, mov) => acc + mov, 0);
+console.log(overalBalance);
+
+// or with chaining - the same
+const overalBalance1 = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((acc, mov) => acc + mov, 0)
+console.log(overalBalance1);
+
+
+// or with flatmap
+const overalBalance2 = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((acc, mov) => acc + mov, 0)
+console.log(overalBalance2);
+// ....................................................
+
+
+
+// ....................................................
+// SORT
+// mutates the original array
+const months = ['March', 'Jan', 'Feb', 'Dec'];
+months.sort();
+console.log(months);
+// Expected output: Array ["Dec", "Feb", "Jan", "March"]
+const array15 = [1, 30, 4, 21, 100000];
+array1.sort();
+console.log(array15);
+// Expected output: Array [1, 100000, 21, 30, 4]
+
+
+// Other examples
+
+const owners = ['jonas', 'Zach', 'Adam', 'Martha'];
+console.log(owners.sort());
+console.log(owners);
+
+
+// With number it is different
+console.log(movements);
+console.log(movements.sort()); // ---> dont work, sort by string
+// how to solve:
+// return < a, A,B
+// return > 0, B,A
+
+// ASCENDING
+movements.sort((a,b) => {
+  if (a > b) return 1;
+  if (a < b) return -1;
+});
+
+console.log(movements);
+
+// the same
+movements.sort((a,b) => a - b);
+
+
+// DESCENDING
+movements.sort((a,b) => {
+  if (a > b) return -1;
+  if (a < b) return 1;
+});
+
+
+// the same
+movements.sort((a,b) => b - a);
+
+console.log(movements);
+// ....................................................
+
+
+
+
+
+// ....................................................
+// Creating and Filling Arrays
+
+console.log([1,2,3,4,5,6,7]);
+console.log(new Array(1,2,3,4,5,6,7));
+
+// FILL
+// Creates a empty aray with length 7
+const x = new Array(7);
+console.log(x);
+// console.log(x.map(() => 5)); // ---> dont work
+
+// Solution, method fill
+// x.fill(1);
+x.fill(1, 3, 5); //---> do index 3 ate ao 5 preenche com 1
+console.log(x);
+
+arr.fill(23, 2, 6);
+console.log(arr);
+
+// FROM
+const y = Array.from({length: 7}, () => 1 );
+console.log(y);
+
+const z = Array.from({length: 7}, (_, i) => i + 1);
+console.log(z);
+
+
+labelBalance.addEventListener('click', function(){
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements_value'),
+    el => Number(el.textContent.replace('€', ''))
+  );
+  console.log(movementsUI);
+  // const movementsUI2 = [...document.querySelectorAll('.movements__value')];
+});
+// ....................................................
+
+
+// ....................................................
+// Which array we should use?
+
+// we learn gross 23 methods to arrays
+// ....................................................
+
+
+// ....................................................
+// Practice lecture
+
+// 1 - Total deposits of all accounts
+const bankDepositSum = accounts
+  .flatMap(acc => acc.movements)
+  .filter(mov => mov >0)
+  .reduce((sum, curr) => sum + curr, 0);
+
+// 2 - Count deposits above 1000
+const numDeposits1000x = accounts
+  .flatMap(acc => acc.movements)
+  .filter(mov => mov > 1000)
+  .length;
+
+console.log(numDeposits1000x);
+
+// do the same but with reduce
+const numDeposits1000y = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((count, cur) => cur >= 1000 ? count ++ : count, 0)
+
+console.log(numDeposits1000y);
+
+let a = 10;
+console.log(a++); //---> return 10
+console.log(a); //---> return 11
+console.log(++a); //---> return 12
+console.log(a); //---> return 12
+
+
+// // 3 - New object Sum of deposits and sum of withdrawals
+// const { deposits, withdrawals} = accounts
+//   .flatMap(acc => acc.movements)
+//   .reduce(
+//     (sums, cur) => {
+//     // cur > 0 ? sums.deposits += cur : sums.withdrawals += cur;
+//     // OR
+//       sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+//       return sums;
+//     },
+//     { deposits: 0, withdrawals: 0 }
+//   );
+
+// console.log(deposits, withdrawals);
+
+
+// 4 - Convert string to TitleCase
+
+// exemple: This Is a Nice Title
+
+const convertTitleCase = function(title) {
+  const capitalize = str => str[0].toUpperCase() + str.slice(1);
+  const exceptions = ['a', 'an', 'and', 'the', 'but', 'or', 'on', 'in', 'with'];
+  const titleCase = title
+    .toLowerCase()
+    .split(' ')
+    .map(word => (exceptions.includes(word) ? word : capitalize(word)))
+    .join(' ')
+  return capitalize(titleCase);
+};
+
+console.log(convertTitleCase('this is a nice title'));
+console.log(convertTitleCase('this is a LONG title but not too long'));
+console.log(convertTitleCase('and here is another title with an EXAMPLE'));
+// ....................................................
+
+
+
+
+// ....................................................
+//  Coding Challange # 4
+
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+  ];
+
+// 1
+dogs.forEach(dog => (dog.recFood = Math.trunc( dog.weight ** 0.75 * 28)));
+console.log(dogs);
+
+// 2
+const sarahDog = dogs.find( dog => dog.owners.includes('Sarah'));
+console.log(sarahDog);
+console.log(`Sarah s dog is eating too ${sarahDog.curFood > sarahDog.recFood ? 'much' : 'little'}`);
+
+// 3
+const ownersEatTooMuch = dogs
+  .filter(dog => dog.curFood > dog.recFood)
+  .flatMap(dog => dog.owners)
+console.log(ownersEatTooMuch);
+
+
+const ownersEatTooLittle = dogs
+  .filter(dog => dog.curFood < dog.recFood )
+  .flatMap(dog => dog.owners)
+console.log(ownersEatTooLittle);
+
+// 4
+console.log(`${ownersEatTooMuch.join(', ')} dogs eat too much`);
+console.log(`${ownersEatTooLittle.join(', ')} dogs eat too little`);
+
+// 5
+const dogsEatTooPerfect = dogs
+  .some(dog => dog.curFood === dog.recFood )
+console.log(dogsEatTooPerfect);
+
+// 6
+const checkEatingOk = dog =>  dog.curFood < 1.1 * dog.recFood && dog.curFood > 0.9 * dog.recFood;
+
+const dogsEatOk = dogs
+  .some(checkEatingOk);
+console.log(dogsEatOk);
+
+// 7
+console.log(dogs.filter(checkEatingOk));
+
+// 8
+// create shallow copy
+const shallowCopySorted = dogs
+  .slice()
+  .sort((a,b) => a.recFood - b.recFood);
+console.log(shallowCopySorted);
 // ....................................................
