@@ -1,4 +1,4 @@
-'use strict';
+f'use strict';
 
 // Data needed for a later exercise
 const flights =
