@@ -385,3 +385,280 @@ tesla.brake();
 tesla.chargeBatery(55);
 console.log(tesla);
 // ............................................................................
+
+
+// ............................................................................
+// // Inheritance between Classes - ES6 Classes
+class PersonCl1 {
+  constructor(fullName, birthYear) {
+    this.fullName = fullName;
+    this.birthYear = birthYear;
+  }
+  // methods will be added to .prototype property
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  }
+
+  get age() {
+    return 2037 - this.birthYear;
+  }
+
+  // Set a property that already exists
+  set fullName(name) {
+    console.log(name);
+    if (name.includes(' ')) this._fullName = name;
+    else alert(`${name} is not a full name!`)
+  }
+
+  get fullName(){
+    return this._fullName
+  }
+
+  static hey() {
+    console.log('Hey there');
+    console.log(this);
+  }
+};
+
+class StudentCl extends PersonCl1 {
+  constructor(fullName, birthYear, course) {
+    // Always needs to happen first
+    super(fullName, birthYear);
+    this.course = course;
+  }
+
+  introduce() {
+    console.log(`My name is ${this.fullName} and I study
+    ${this.course}`);
+  }
+
+  calcAge() {
+    console.log(`I am ${2037 - this.birthYear} years
+    old, but as student i fell more like ${2037 - this.birthYear + 10}`)
+  }
+};
+
+const martha = new StudentCl('Martha Jones', 2012, 'Computer Science');
+martha.introduce();
+// calcAge overwith, wins the child class
+martha.calcAge();
+// ............................................................................
+
+
+
+// ............................................................................
+// Inheritance Between - Object.create()
+
+const PersonProto1 = {
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  },
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  }
+};
+
+const steven1 = Object.create(PersonProto1);
+
+const StudentProto = Object.create(PersonProto1); // parent child relation
+
+StudentProto.init = function (firstName, birthYear, course) {
+  PersonProto1.init.call(this, firstName, birthYear)
+  this.course = course;
+};
+
+StudentProto.introduce = function () {
+  console.log(`My name is ${this.firstName} and I study
+    ${this.course}`);
+};
+
+const jay1 = Object.create(StudentProto);
+
+jay1.init('Jay', 2010, 'Computer Science');
+jay1.introduce();
+jay1.calcAge();
+// ............................................................................
+
+
+
+// ............................................................................
+// Another Class Example
+
+class Account {
+  //  1) Public Fields (instances)
+  locale = navigator.language;
+
+  // 2) Private Fields (instances)
+  #movements = [];
+  #pin;
+
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    // protected property
+    this.#pin = pin;
+    // this._movements = []; // _ protect data
+    // this.locale = navigator.language;
+    console.log(`Thanks for openning an account ${owner}`)
+  }
+
+  // 3) Public Methods
+
+  // Public interface
+  getMovements() {
+    return this.#movements;
+  }
+
+  deposit(val) {
+    this.#movements.push(val);
+    return this;
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+    return this;
+  }
+
+  requestLoan(val) {
+    // if(this.#approveLoan(val)) {
+    if(this._approveLoan(val)) {
+      this.deposit(val);
+      console.log(`Loan approved`);
+      return this;
+    }
+  }
+
+  static helper() {
+    console.log(`Bla bla bla`);
+  }
+
+  // 4) Private Methods
+  // #approveLoan(val) {  para ja nao funciona no google chrome, considera private field e deveria ser private method
+    _approveLoan(val) {
+    return true
+  }
+
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+// acc1._movements.push(250);
+// acc1._movements.push(-140);
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+// acc1.approveLoan(1000);
+console.log(acc1.getMovements());
+
+console.log(acc1);
+
+// Protect the pin and movements - data privacy and encapsulation - on the next video
+console.log(acc1.pin);
+// ............................................................................
+
+
+// ............................................................................
+// Encapsulation: (protect methods and properties)
+// _
+// ............................................................................
+
+
+
+// ............................................................................
+// Encapsulation: Private Class Fields and Methods
+//  1) Public Fields
+//  2) Private Fields
+//  3) Public Methods
+//  4) Private Methods
+//  5) (there is also the static version)
+// console.log(acc1.#movements); // Private field '#movements' must be declared in an enclosing
+// console.log(acc1.#pin); //SyntaxError: Private field '#pin'
+// console.log(acc1.#approveLoan(100)); // SyntaxError: Private field '#approveLoan'
+// ............................................................................
+
+
+
+// ............................................................................
+// Chaining Methods
+
+acc1
+  .deposit(300)
+  .deposit(500)
+  .withdraw(35)
+  .requestLoan(25000)
+  .withdraw(4000);
+
+console.log(acc1.getMovements());
+// ............................................................................
+
+// ............................................................................
+// ES6 Classes - summary
+// ............................................................................
+
+
+// ............................................................................
+// Coding Challange # 4
+class CarCl1 {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  get speedUS() {
+    return this.speed / 1.6;
+  }
+
+  set speedUS(speed) {
+    this.speed = speed * 1.6;
+  };
+
+
+  accelarate() {
+    console.log(this.speed += 10);
+  }
+
+  brake() {
+    console.log(this.speed -= 5);
+    return this;
+  }
+};
+
+
+class EVCl extends CarCl1 {
+  #charge;
+  constructor(make, speed, charge) {
+    super(make, speed);
+    this.#charge = charge;
+  }
+
+  chargeBaterry (chargeTo) {
+    this.#charge = chargeTo;
+    return this;
+  }
+
+  accelarate() {
+    this.speed += 20;
+    this.#charge -= 1;
+    console.log(`${this.make} going at ${this.speed} km/h
+    with a charge ${this.#charge}`);
+    return this;
+  }
+}
+
+
+const rivian = new EVCl('Rivian', 120, 23);
+console.log(rivian);
+// console.log(rivian.#charge);
+rivian
+  .accelarate()
+  .accelarate()
+  .accelarate()
+  .brake()
+  .chargeBaterry(50)
+  .accelarate()
+
+console.log(rivian.speedUS);
+
+// ............................................................................
