@@ -219,7 +219,7 @@ btn.addEventListener('click', function () {
 ///////////////////////////////////////
 // Coding Challenge #1
 
-/* 
+/*
 In this challenge you will build a function 'whereAmI' which renders a country ONLY based on GPS coordinates. For that, you will use a second API to geocode coordinates.
 
 Here are your tasks:
@@ -243,7 +243,7 @@ TEST COORDINATES 2: -33.933, 18.474
 GOOD LUCK 😀
 */
 
-/*
+
 const whereAmI = function (lat, lng) {
   fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
     .then(res => {
@@ -382,7 +382,7 @@ btn.addEventListener('click', whereAmI);
 ///////////////////////////////////////
 // Coding Challenge #2
 
-/* 
+/*
 Build the image loading functionality that I just showed you on the screen.
 
 Tasks are not super-descriptive this time, so that you can figure out some stuff on your own. Pretend you're working on your own 😉
@@ -481,10 +481,10 @@ const whereAmI = async function () {
     const res = await fetch(
       `https://restcountries.eu/rest/v2/name/${dataGeo.country}`
     );
-    
+
     // BUG in video:
     // if (!resGeo.ok) throw new Error('Problem getting country');
-    
+
     // FIX:
     if (!res.ok) throw new Error('Problem getting country');
 
@@ -650,7 +650,7 @@ Promise.any([
 ///////////////////////////////////////
 // Coding Challenge #3
 
-/* 
+/*
 PART 1
 Write an async function 'loadNPause' that recreates Coding Challenge #2, this time using async/await (only the part where the promise is consumed). Compare the two versions, think about the big differences, and see which one you like more.
 Don't forget to test the error handler, and to set the network speed to 'Fast 3G' in the dev tools Network tab.
