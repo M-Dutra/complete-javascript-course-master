@@ -296,21 +296,21 @@ const getJSON = function(url, errorMSG = 'Something went wrong') {
 
 // .............................................................................
 // Build PROMISE (259)
-// const lotteryPromise = new Promise(function(resolve, reject){
+const lotteryPromise = new Promise(function(resolve, reject){
 
-//   console.log('Lottery draw is happening 🔮');
+  console.log('Lottery draw is happening 🔮');
 
-//   setTimeout(function(){
+  setTimeout(function(){
 
-//     if(Math.random() >= 0.5) {
-//       resolve('You WIN 💰');
-//     } else {
-//       reject(new Error('You LOST your money 😱'));
-//     }
+    if(Math.random() >= 0.5) {
+      resolve('You WIN 💰');
+    } else {
+      reject(new Error('You LOST your money 😱'));
+    }
 
-//   }, 2000)
+  }, 2000)
 
-// });
+});
 
 // lotteryPromise
 //   .then(response => console.log(response))
@@ -637,13 +637,13 @@ const getJSON = function(url, errorMSG = 'Something went wrong') {
 
 // return first fullfield promise, and ignore promise reject
 
-Promise.any([
-  Promise.resolve('Success'),
-  Promise.reject('Error'),
-  Promise.resolve('Another success'),
-])
-  .then(res => console.log(res))
-  .catch(err => console.error(err));
+// Promise.any([
+//   Promise.resolve('Success'),
+//   Promise.reject('Error'),
+//   Promise.resolve('Another success'),
+// ])
+//   .then(res => console.log(res))
+//   .catch(err => console.error(err));
 
 
 // .............................................................................
