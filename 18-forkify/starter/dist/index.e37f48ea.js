@@ -595,7 +595,7 @@ const renderSpinner = function(parentEl) {
     const markup = `
     <div class="spinner">
       <svg>
-        <use href="src/img/icons.svg#icon-loader"></use>
+        <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
       </svg>
     </div>
   `;
