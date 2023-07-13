@@ -16,7 +16,7 @@ class RecipeView {
   }
 
   #clear() {
-    this.#parentElement = '';
+    this.#parentElement.innerHTML = '';
   }
 
   renderSpinner() {
